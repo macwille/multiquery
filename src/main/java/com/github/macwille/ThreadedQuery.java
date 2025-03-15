@@ -1,5 +1,9 @@
 package com.github.macwille;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -7,17 +11,15 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-public class ThreadedQuery implements Callable<List<String>> {
+public final class ThreadedQuery implements Callable<List<String>> {
   private static final Logger LOGGER = LoggerFactory.getLogger(ThreadedQuery.class);
 
-  private final Connection connection;
+  private final DataSource dataSource;
   private final String query;
 
-  public ThreadedQuery(final Connection connection, final String query) {
-    this.connection = connection;
+  public ThreadedQuery(final DataSource dataSource, final String query) {
+    this.dataSource = dataSource;
     this.query = query;
   }
 
@@ -26,8 +28,9 @@ public class ThreadedQuery implements Callable<List<String>> {
     LOGGER.debug("Executing query: {}", query);
 
     final List<String> results = new ArrayList<>();
-    try (final PreparedStatement statement = connection.prepareStatement(query)) {
-      ResultSet resultSet = statement.executeQuery();
+    try (final Connection connection = dataSource.getConnection();
+         final PreparedStatement statement = connection.prepareStatement(query)) {
+      final ResultSet resultSet = statement.executeQuery();
       while (resultSet.next()) {
         results.add(resultSet.getString(1));
       }
