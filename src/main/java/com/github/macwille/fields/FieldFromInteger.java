@@ -21,31 +21,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.github.macwille;
+package com.github.macwille.fields;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Queue;
+public final class FieldFromInteger implements FieldFromValue<Integer> {
 
-public final class QueriesToBatches {
+    private final Field<Integer> field;
 
-    private final Queue<Query> queries;
-    private final int batchSize;
-
-    public QueriesToBatches(final Queue<Query> queries, final int batchSize) {
-        this.queries = queries;
-        this.batchSize = batchSize;
+    public FieldFromInteger(final String name, final String type, final Integer value) {
+        this(new ResultField<>(name, type, value));
     }
 
-    public List<Query> next() {
-        final List<Query> batch = new ArrayList<>(batchSize);
-        while (batch.size() < batchSize && !queries.isEmpty()) {
-            batch.add(queries.poll());
-        }
-        return batch;
+    public FieldFromInteger(final Field<Integer> field) {
+        this.field = field;
     }
 
-    public boolean hasNext() {
-        return !queries.isEmpty();
+    @Override
+    public Field<Integer> field() {
+        return field;
     }
 }

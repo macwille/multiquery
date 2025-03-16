@@ -21,25 +21,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.github.macwille;
+package com.github.macwille.fields;
 
-import javax.sql.DataSource;
-import java.util.List;
+import java.sql.Timestamp;
 
-public final class QueryFromString implements Query {
+public final class FieldFromTimestamp implements FieldFromValue<Timestamp> {
 
-    private final Query query;
+    private final Field<Timestamp> field;
 
-    public QueryFromString(final DataSource dataSource, final String sql) {
-        this(new ExecutableQuery(dataSource, sql));
+    public FieldFromTimestamp(final String name, final String type, final Timestamp value) {
+        this(new ResultField<>(name, type, value));
     }
 
-    public QueryFromString(final Query query) {
-        this.query = query;
+    public FieldFromTimestamp(final Field<Timestamp> field) {
+        this.field = field;
     }
 
     @Override
-    public List<String> call() throws Exception {
-        return query.call();
+    public Field<Timestamp> field() {
+        return field;
     }
 }

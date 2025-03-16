@@ -21,40 +21,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.github.macwille;
+package com.github.macwille.fields;
 
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
+public record NullField(String name) implements Field<Object> {
 
-public final class ExecutableQuery implements Query {
-
-    private final DataSource dataSource;
-    private final String query;
-
-    public ExecutableQuery(final DataSource dataSource, final String query) {
-        this.dataSource = dataSource;
-        this.query = query;
+    @Override
+    public String type() {
+        return "NULL";
     }
 
-    public List<String> call() {
-        final List<String> results = new ArrayList<>();
-        try (
-                final Connection connection = dataSource.getConnection(); final PreparedStatement statement = connection
-                        .prepareStatement(query);
-                final ResultSet resultSet = statement.executeQuery()
-        ) {
-            while (resultSet.next()) {
-                results.add(resultSet.getString(1));
-            }
-        }
-        catch (final SQLException e) {
-            throw new ThreadRuntimeException("Query execution failed", e);
-        }
-        return results;
+    @Override
+    public Object value() {
+        return null;
     }
 }

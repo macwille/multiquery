@@ -21,28 +21,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.github.macwille;
+package com.github.macwille.fields;
 
-import javax.sql.DataSource;
-import java.util.ArrayList;
-import java.util.List;
+public final class FieldFromDouble implements FieldFromValue<Double> {
 
-public final class QueriesFromStrings {
+    private final Field<Double> field;
 
-    private final DataSource dataSource;
-    private final List<String> sqlList;
-
-    public QueriesFromStrings(final DataSource dataSource, final List<String> sqlList) {
-        this.dataSource = dataSource;
-        this.sqlList = sqlList;
+    public FieldFromDouble(final String name, final String type, final Double value) {
+        this(new ResultField<>(name, type, value));
     }
 
-    public List<Query> queries() {
+    public FieldFromDouble(final Field<Double> field) {
+        this.field = field;
+    }
 
-        final List<Query> queryQueue = new ArrayList<>(sqlList.size());
-        for (final String sql : sqlList) {
-            queryQueue.add(new QueryFromString(dataSource, sql));
-        }
-        return queryQueue;
+    @Override
+    public Field<Double> field() {
+        return field;
     }
 }

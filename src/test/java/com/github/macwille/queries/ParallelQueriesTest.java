@@ -21,11 +21,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.github.macwille;
+package com.github.macwille.queries;
 
+import com.github.macwille.Record;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.junit.jupiter.api.*;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -42,13 +44,19 @@ final class ParallelQueriesTest {
 
     @BeforeAll
     void setUp() throws Exception {
-        setupconnection = DriverManager.getConnection("jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1");
+        setupconnection = DriverManager.getConnection(url);
         Assertions.assertDoesNotThrow(() -> {
             PreparedStatement stmt = setupconnection
                     .prepareStatement("CREATE TABLE parallel_query_test (id INT PRIMARY KEY, name VARCHAR(255));");
             stmt.execute();
         });
-        Assertions.assertDoesNotThrow(() -> generateRows(20000));
+        Assertions.assertDoesNotThrow(() -> {
+            try (final Statement stmt = setupconnection.createStatement()) {
+                for (int i = 1; i <= 20000; i++) {
+                    stmt.execute("INSERT INTO parallel_query_test (id, name) VALUES (" + i + ", 'Name" + i + "');");
+                }
+            }
+        });
     }
 
     @AfterAll
@@ -79,10 +87,11 @@ final class ParallelQueriesTest {
         final List<Query> queryList = queriesFromStrings.queries();
 
         final ParallelQueries parallelQueries = new ParallelQueries(queryList);
-        final List<List<String>> resultListList = Assertions.assertDoesNotThrow(parallelQueries::resultList);
+        final List<List<com.github.macwille.Record>> resultListList = Assertions
+                .assertDoesNotThrow(parallelQueries::resultList);
 
         int loops = 0;
-        for (final List<String> resultList : resultListList) {
+        for (final List<com.github.macwille.Record> resultList : resultListList) {
             Assertions.assertEquals(5000, resultList.size());
             loops++;
         }
@@ -113,10 +122,11 @@ final class ParallelQueriesTest {
         final List<Query> queryList = queriesFromStrings.queries();
 
         final ParallelQueries parallelQueries = new ParallelQueries(queryList);
-        final List<List<String>> resultListList = Assertions.assertDoesNotThrow(parallelQueries::resultList);
+        final List<List<com.github.macwille.Record>> resultListList = Assertions
+                .assertDoesNotThrow(parallelQueries::resultList);
 
         int loops = 0;
-        for (final List<String> resultList : resultListList) {
+        for (final List<Record> resultList : resultListList) {
             Assertions.assertEquals(5000, resultList.size());
             loops++;
         }

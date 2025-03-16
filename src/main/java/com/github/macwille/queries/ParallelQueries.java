@@ -21,8 +21,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.github.macwille;
+package com.github.macwille.queries;
 
+import com.github.macwille.Record;
+import com.github.macwille.ThreadRuntimeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,9 +52,9 @@ public final class ParallelQueries {
         this.threads = threads;
     }
 
-    public List<List<String>> resultList() {
+    public List<List<com.github.macwille.Record>> resultList() {
 
-        final List<List<String>> resultList = new ArrayList<>();
+        final List<List<com.github.macwille.Record>> resultList = new ArrayList<>();
 
         try (final ExecutorService executorService = Executors.newFixedThreadPool(threads)) {
 
@@ -63,9 +65,10 @@ public final class ParallelQueries {
                     LOGGER.debug("Executing next batch with size <{}>", queryBatch.size());
                 }
 
-                final List<Future<List<String>>> futureResults = executorService.invokeAll(queryBatch);
+                final List<Future<List<com.github.macwille.Record>>> futureResults = executorService
+                        .invokeAll(queryBatch);
 
-                for (final Future<List<String>> future : futureResults) {
+                for (final Future<List<Record>> future : futureResults) {
                     resultList.add(future.get());
                 }
             }

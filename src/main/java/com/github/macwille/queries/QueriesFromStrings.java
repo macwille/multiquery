@@ -21,13 +21,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.github.macwille;
+package com.github.macwille.queries;
 
+import javax.sql.DataSource;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
 
-public interface Query extends Callable<List<String>> {
+public final class QueriesFromStrings {
 
-    List<String> call() throws Exception;
+    private final DataSource dataSource;
+    private final List<String> sqlList;
 
+    public QueriesFromStrings(final DataSource dataSource, final List<String> sqlList) {
+        this.dataSource = dataSource;
+        this.sqlList = sqlList;
+    }
+
+    public List<Query> queries() {
+
+        final List<Query> queryQueue = new ArrayList<>(sqlList.size());
+        for (final String sql : sqlList) {
+            queryQueue.add(new QueryFromString(dataSource, sql));
+        }
+        return queryQueue;
+    }
 }
