@@ -28,5 +28,6 @@ import java.util.concurrent.Callable;
 
 public interface Query extends Callable<List<String>> {
 
-    public List<String> call() throws Exception;
+    List<String> call() throws Exception;
+
 }
