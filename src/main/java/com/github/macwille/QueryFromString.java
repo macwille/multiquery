@@ -21,3 +21,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+package com.github.macwille;
+
+import javax.sql.DataSource;
+import java.util.List;
+
+public final class QueryFromString implements Query {
+
+    private final Query query;
+
+    public QueryFromString(final DataSource dataSource, final String sql) {
+        this(new ExecutableQuery(dataSource, sql));
+    }
+
+    public QueryFromString(final Query query) {
+        this.query = query;
+    }
+
+    @Override
+    public List<String> call() throws Exception {
+        return query.call();
+    }
+}

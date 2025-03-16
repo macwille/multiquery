@@ -21,3 +21,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+package com.github.macwille;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Queue;
+
+public final class QueriesToBatches {
+
+    private final Queue<Query> queries;
+    private final int batchSize;
+
+    public QueriesToBatches(final Queue<Query> queries, final int batchSize) {
+        this.queries = queries;
+        this.batchSize = batchSize;
+    }
+
+    public List<Query> next() {
+        final List<Query> batch = new ArrayList<>(batchSize);
+        while (batch.size() < batchSize && !queries.isEmpty()) {
+            batch.add(queries.poll());
+        }
+        return batch;
+    }
+
+    public boolean hasNext() {
+        return !queries.isEmpty();
+    }
+}

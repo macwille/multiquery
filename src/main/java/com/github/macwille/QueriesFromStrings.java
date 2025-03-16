@@ -21,3 +21,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+package com.github.macwille;
+
+import javax.sql.DataSource;
+import java.util.ArrayList;
+import java.util.List;
+
+public final class QueriesFromStrings {
+
+    private final DataSource dataSource;
+    private final List<String> sqlList;
+
+    public QueriesFromStrings(final DataSource dataSource, final List<String> sqlList) {
+        this.dataSource = dataSource;
+        this.sqlList = sqlList;
+    }
+
+    public List<Query> queries() {
+
+        final List<Query> queryQueue = new ArrayList<>(sqlList.size());
+        for (final String sql : sqlList) {
+            queryQueue.add(new QueryFromString(dataSource, sql));
+        }
+        return queryQueue;
+    }
+}

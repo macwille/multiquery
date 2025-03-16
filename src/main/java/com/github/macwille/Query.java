@@ -21,3 +21,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+package com.github.macwille;
+
+import java.util.List;
+import java.util.concurrent.Callable;
+
+public interface Query extends Callable<List<String>> {
+
+    public List<String> call() throws Exception;
+}

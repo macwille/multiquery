@@ -21,3 +21,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+package com.github.macwille;
+
+public final class ThreadRuntimeException extends RuntimeException {
+
+    public ThreadRuntimeException(final String message, final Throwable cause) {
+        super(message + ", caused by(" + cause.getMessage() + ")", cause);
+    }
+}

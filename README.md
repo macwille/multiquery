@@ -7,6 +7,7 @@ Project to create a reusable Java library for executing a collection of SQL quer
 ## Contribute
 
 Feel free to create issues or pull requests.
+Run `mvn clean package` to check if the code is acceptable.
 
 I will try to use Elegant Objects (EO) design principles in this code base.
 If you wish to contribute, please try to follow them also.
