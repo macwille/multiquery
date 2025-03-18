@@ -21,24 +21,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.github.macwille.fields;
+package com.github.macwille.queries;
 
-import java.sql.Timestamp;
+import org.jooq.Record;
+import org.jooq.Result;
 
-public final class FieldFromTimestamp implements FieldFromValue<Timestamp> {
+import java.util.concurrent.Callable;
 
-    private final Field<Timestamp> field;
+public interface CallableQuery extends Callable<Result<Record>> {
 
-    public FieldFromTimestamp(final String name, final String type, final Timestamp value) {
-        this(new ResultField<>(name, type, value));
-    }
+    Result<Record> call() throws Exception;
 
-    public FieldFromTimestamp(final Field<Timestamp> field) {
-        this.field = field;
-    }
-
-    @Override
-    public Field<Timestamp> field() {
-        return field;
-    }
 }

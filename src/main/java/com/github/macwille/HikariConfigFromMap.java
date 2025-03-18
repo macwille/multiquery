@@ -21,22 +21,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.github.macwille.fields;
+package com.github.macwille;
 
-public final class FieldFromInteger implements FieldFromValue<Integer> {
+import com.zaxxer.hikari.HikariConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-    private final Field<Integer> field;
+import java.util.Map;
 
-    public FieldFromInteger(final String name, final String type, final Integer value) {
-        this(new ResultField<>(name, type, value));
+public final class HikariConfigFromMap {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(HikariConfigFromMap.class);
+
+    private final Map<String, String> options;
+
+    public HikariConfigFromMap(final Map<String, String> options) {
+        this.options = options;
     }
 
-    public FieldFromInteger(final Field<Integer> field) {
-        this.field = field;
-    }
+    public HikariConfig config() {
+        LOGGER.debug("Incoming options <{}>", options);
+        final String url = options.get("url");
+        final String username = options.get("username");
+        final String password = options.get("password");
+        final String poolSize = options.getOrDefault("poolSize", "4");
 
-    @Override
-    public Field<Integer> field() {
-        return field;
+        final HikariConfig hikariConfig = new HikariConfig();
+        hikariConfig.setJdbcUrl(url);
+        hikariConfig.setUsername(username);
+        hikariConfig.setPassword(password);
+        hikariConfig.setMaximumPoolSize(Integer.parseInt(poolSize));
+
+        return hikariConfig;
     }
 }

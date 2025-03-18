@@ -23,28 +23,28 @@
  */
 package com.github.macwille.queries;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 
-public final class QueriesToBatches {
+public final class QueriesToBatches implements Iterator<List<CallableQuery>> {
 
-    private final Queue<Query> queries;
+    private final Queue<CallableQuery> queries;
     private final int batchSize;
 
-    public QueriesToBatches(final Queue<Query> queries, final int batchSize) {
+    public QueriesToBatches(final Queue<CallableQuery> queries, final int batchSize) {
         this.queries = queries;
         this.batchSize = batchSize;
     }
 
-    public List<Query> next() {
-        final List<Query> batch = new ArrayList<>(batchSize);
+    @Override
+    public List<CallableQuery> next() throws NoSuchElementException {
+        final List<CallableQuery> batch = new ArrayList<>(batchSize);
         while (batch.size() < batchSize && !queries.isEmpty()) {
             batch.add(queries.poll());
         }
         return batch;
     }
 
+    @Override
     public boolean hasNext() {
         return !queries.isEmpty();
     }

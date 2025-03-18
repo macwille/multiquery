@@ -23,8 +23,9 @@
  */
 package com.github.macwille.queries;
 
-import com.github.macwille.Record;
 import com.github.macwille.ThreadRuntimeException;
+import org.jooq.Record;
+import org.jooq.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,39 +37,42 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-public final class ParallelQueries {
+public final class ParallelQueryList {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ParallelQueries.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ParallelQueryList.class);
 
     private final QueriesToBatches queryList;
     private final int threads;
 
-    public ParallelQueries(final List<Query> queryList) {
+    public ParallelQueryList(final List<CallableQuery> queryList) {
         this(new QueriesToBatches(new LinkedList<>(queryList), 4), 4);
     }
 
-    public ParallelQueries(final QueriesToBatches queryList, final int threads) {
+    public ParallelQueryList(final List<CallableQuery> queryList, final int threads) {
+        this(new QueriesToBatches(new LinkedList<>(queryList), threads), threads);
+    }
+
+    public ParallelQueryList(final QueriesToBatches queryList, final int threads) {
         this.queryList = queryList;
         this.threads = threads;
     }
 
-    public List<List<com.github.macwille.Record>> resultList() {
+    public List<Result<Record>> resultList() {
 
-        final List<List<com.github.macwille.Record>> resultList = new ArrayList<>();
+        final List<Result<Record>> resultList = new ArrayList<>();
 
         try (final ExecutorService executorService = Executors.newFixedThreadPool(threads)) {
 
             while (queryList.hasNext()) {
-                final List<Query> queryBatch = queryList.next();
+                final List<CallableQuery> queryBatches = queryList.next();
 
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Executing next batch with size <{}>", queryBatch.size());
+                    LOGGER.debug("Executing next batch with size <{}>", queryBatches.size());
                 }
 
-                final List<Future<List<com.github.macwille.Record>>> futureResults = executorService
-                        .invokeAll(queryBatch);
+                final List<Future<Result<Record>>> futureResults = executorService.invokeAll(queryBatches);
 
-                for (final Future<List<Record>> future : futureResults) {
+                for (final Future<Result<Record>> future : futureResults) {
                     resultList.add(future.get());
                 }
             }

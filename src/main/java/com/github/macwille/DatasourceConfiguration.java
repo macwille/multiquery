@@ -21,17 +21,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.github.macwille.fields;
+package com.github.macwille;
 
-public record NullField(String name) implements Field<Object> {
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 
-    @Override
-    public String type() {
-        return "NULL";
+import java.util.Map;
+
+public final class DatasourceConfiguration {
+
+    final HikariConfig hikariConfig;
+
+    public DatasourceConfiguration(final Map<String, String> options) {
+        this(new HikariConfigFromMap(options).config());
     }
 
-    @Override
-    public Object value() {
-        return null;
+    public DatasourceConfiguration(final HikariConfig hikariConfig) {
+        this.hikariConfig = hikariConfig;
+    }
+
+    public HikariDataSource dataSource() {
+        return new HikariDataSource(hikariConfig);
     }
 }

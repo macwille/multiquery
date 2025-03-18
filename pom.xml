@@ -36,6 +36,12 @@
       <artifactId>HikariCP</artifactId>
       <version>${com.zaxxer.hikari.version}</version>
     </dependency>
+      <!-- JOOQ -->
+      <dependency>
+          <groupId>org.jooq</groupId>
+          <artifactId>jooq</artifactId>
+          <version>3.20.2</version>
+      </dependency>
     <!-- Logging -->
     <!-- SLF4J -->
     <dependency>

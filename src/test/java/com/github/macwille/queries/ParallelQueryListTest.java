@@ -23,9 +23,10 @@
  */
 package com.github.macwille.queries;
 
-import com.github.macwille.Record;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import org.jooq.Record;
+import org.jooq.Result;
 import org.junit.jupiter.api.*;
 
 import java.sql.Connection;
@@ -35,11 +36,9 @@ import java.sql.Statement;
 import java.util.List;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-final class ParallelQueriesTest {
+final class ParallelQueryListTest {
 
-    private final String url = "jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1";
-    private final String username = "sa";
-    private final String password = "";
+    private final String url = "jdbc:h2:mem:testdb2;DB_CLOSE_DELAY=-1;MODE=MySQL";
     Connection setupconnection;
 
     @BeforeAll
@@ -68,8 +67,6 @@ final class ParallelQueriesTest {
     void testFourParallelQueries() {
         HikariConfig hikariConfig = new HikariConfig();
         hikariConfig.setJdbcUrl(url);
-        hikariConfig.setUsername(username);
-        hikariConfig.setUsername(password);
         hikariConfig.setMaximumPoolSize(4);
 
         final HikariDataSource hikariDataSource = Assertions
@@ -84,14 +81,13 @@ final class ParallelQueriesTest {
                 hikariDataSource,
                 List.of(query1Sql, query2Sql, query3Sql, query4Sql)
         );
-        final List<Query> queryList = queriesFromStrings.queries();
+        final List<CallableQuery> queryList = queriesFromStrings.queries();
 
-        final ParallelQueries parallelQueries = new ParallelQueries(queryList);
-        final List<List<com.github.macwille.Record>> resultListList = Assertions
-                .assertDoesNotThrow(parallelQueries::resultList);
+        final ParallelQueryList parallelQueryList = new ParallelQueryList(queryList);
+        final List<Result<Record>> resultListList = Assertions.assertDoesNotThrow(parallelQueryList::resultList);
 
         int loops = 0;
-        for (final List<com.github.macwille.Record> resultList : resultListList) {
+        for (final Result<Record> resultList : resultListList) {
             Assertions.assertEquals(5000, resultList.size());
             loops++;
         }
@@ -103,8 +99,6 @@ final class ParallelQueriesTest {
 
         HikariConfig hikariConfig = new HikariConfig();
         hikariConfig.setJdbcUrl(url);
-        hikariConfig.setUsername(username);
-        hikariConfig.setUsername(password);
         hikariConfig.setMaximumPoolSize(2);
 
         final HikariDataSource hikariDataSource = Assertions
@@ -119,25 +113,16 @@ final class ParallelQueriesTest {
                 hikariDataSource,
                 List.of(query1Sql, query2Sql, query3Sql, query4Sql)
         );
-        final List<Query> queryList = queriesFromStrings.queries();
+        final List<CallableQuery> callableQueryList = queriesFromStrings.queries();
 
-        final ParallelQueries parallelQueries = new ParallelQueries(queryList);
-        final List<List<com.github.macwille.Record>> resultListList = Assertions
-                .assertDoesNotThrow(parallelQueries::resultList);
+        final ParallelQueryList parallelQueryList = new ParallelQueryList(callableQueryList);
+        final List<Result<Record>> resultListList = Assertions.assertDoesNotThrow(parallelQueryList::resultList);
 
         int loops = 0;
-        for (final List<Record> resultList : resultListList) {
+        for (final Result<Record> resultList : resultListList) {
             Assertions.assertEquals(5000, resultList.size());
             loops++;
         }
         Assertions.assertEquals(4, loops);
-    }
-
-    private void generateRows(final int rowCount) throws Exception {
-        try (final Statement stmt = setupconnection.createStatement()) {
-            for (int i = 1; i <= rowCount; i++) {
-                stmt.execute("INSERT INTO parallel_query_test (id, name) VALUES (" + i + ", 'Name" + i + "');");
-            }
-        }
     }
 }

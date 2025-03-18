@@ -23,30 +23,44 @@
  */
 package com.github.macwille.queries;
 
-import org.jooq.Record;
+import com.github.macwille.ThreadRuntimeException;
+import org.jooq.DSLContext;
 import org.jooq.Result;
 import org.jooq.SQLDialect;
+import org.jooq.exception.DataAccessException;
+import org.jooq.impl.DSL;
+import org.jooq.impl.DefaultConfiguration;
 
 import javax.sql.DataSource;
 
-public final class QueryFromString implements CallableQuery {
+public final class CallableQueryImpl implements CallableQuery {
 
-    private final CallableQuery query;
+    private final DSLContext ctx;
+    private final String query;
 
-    public QueryFromString(final DataSource dataSource, final String sql) {
-        this(new CallableQueryImpl(dataSource, sql, SQLDialect.MYSQL));
+    public CallableQueryImpl(final DataSource dataSource, final String query) {
+        this(DSL.using(new DefaultConfiguration().derive(dataSource).derive(SQLDialect.MYSQL)), query);
     }
 
-    public QueryFromString(final DataSource dataSource, final String sql, final SQLDialect dialect) {
-        this(new CallableQueryImpl(dataSource, sql, dialect));
+    public CallableQueryImpl(final DataSource dataSource, final String query, SQLDialect dialect) {
+        this(DSL.using(new DefaultConfiguration().derive(dataSource).derive(dialect)), query);
     }
 
-    public QueryFromString(final CallableQuery query) {
+    public CallableQueryImpl(final DSLContext ctx, final String query) {
+        this.ctx = ctx;
         this.query = query;
     }
 
     @Override
-    public Result<Record> call() throws Exception {
-        return query.call();
+    public Result<org.jooq.Record> call() {
+        Result<org.jooq.Record> result;
+        try {
+            result = ctx.fetch(query);
+        } catch (DataAccessException e) {
+            Thread.currentThread().interrupt();
+            throw new ThreadRuntimeException("Error fetching record", e);
+        }
+
+        return result;
     }
 }

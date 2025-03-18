@@ -23,9 +23,9 @@
  */
 package com.github.macwille.queries;
 
-import com.github.macwille.Record;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import org.jooq.Record;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 
@@ -36,10 +36,10 @@ import java.sql.Statement;
 import java.util.List;
 
 @TestInstance(Lifecycle.PER_CLASS)
-final class ExecutableQueryTest {
+final class CallableQueryImplTest {
 
     private HikariDataSource hikariDataSource;
-    private final String url = "jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1";
+    private final String url = "jdbc:h2:mem:testdb3;DB_CLOSE_DELAY=-1;MODE=MySQL";
 
     @BeforeAll
     void setUp() {
@@ -61,8 +61,6 @@ final class ExecutableQueryTest {
 
         final HikariConfig hikariConfig = new HikariConfig();
         hikariConfig.setJdbcUrl(url);
-        hikariConfig.setUsername("sa");
-        hikariConfig.setUsername("");
         hikariConfig.setMaximumPoolSize(2);
         hikariDataSource = new HikariDataSource(hikariConfig);
     }
@@ -76,12 +74,10 @@ final class ExecutableQueryTest {
     void testSingleQuery() {
         HikariConfig hikariConfig = new HikariConfig();
         hikariConfig.setJdbcUrl(url);
-        hikariConfig.setUsername("sa");
-        hikariConfig.setUsername("");
         hikariConfig.setMaximumPoolSize(2);
 
         final String querySql = "SELECT * FROM threaded_query_test";
-        final Query query = new ExecutableQuery(new HikariDataSource(hikariConfig), querySql);
+        final CallableQuery query = new CallableQueryImpl(new HikariDataSource(hikariConfig), querySql);
         final List<Record> result = Assertions.assertDoesNotThrow(query::call);
         Assertions.assertEquals(10000, result.size());
     }

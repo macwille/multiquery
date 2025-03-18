@@ -23,6 +23,8 @@
  */
 package com.github.macwille.queries;
 
+import org.jooq.SQLDialect;
+
 import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,18 +33,24 @@ public final class QueriesFromStrings {
 
     private final DataSource dataSource;
     private final List<String> sqlList;
+    private final SQLDialect dialect;
 
     public QueriesFromStrings(final DataSource dataSource, final List<String> sqlList) {
-        this.dataSource = dataSource;
-        this.sqlList = sqlList;
+        this(dataSource, sqlList, SQLDialect.MYSQL);
     }
 
-    public List<Query> queries() {
+    public QueriesFromStrings(final DataSource dataSource, final List<String> sqlList, SQLDialect dialect) {
+        this.dataSource = dataSource;
+        this.sqlList = sqlList;
+        this.dialect = dialect;
+    }
 
-        final List<Query> queryQueue = new ArrayList<>(sqlList.size());
+    public List<CallableQuery> queries() {
+
+        final List<CallableQuery> callableQueryQueue = new ArrayList<>(sqlList.size());
         for (final String sql : sqlList) {
-            queryQueue.add(new QueryFromString(dataSource, sql));
+            callableQueryQueue.add(new QueryFromString(dataSource, sql, dialect));
         }
-        return queryQueue;
+        return callableQueryQueue;
     }
 }

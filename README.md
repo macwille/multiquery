@@ -4,6 +4,8 @@
 
 Project to create a reusable Java library for executing a collection of SQL queries in separate threads automatically.
 
+## How to Use
+
 ## Contribute
 
 Feel free to create issues or pull requests.
