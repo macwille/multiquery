@@ -1,0 +1,7 @@
+name: macwille/multiquery-java
+version: 0.1.0-SNAPSHOT
+library: true
+extensionTargets:
+  codeql/java-all: '*'
+dataExtensions:
+  - models/**/*.yml

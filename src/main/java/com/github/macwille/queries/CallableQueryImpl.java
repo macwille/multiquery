@@ -56,7 +56,8 @@ public final class CallableQueryImpl implements CallableQuery {
         Result<org.jooq.Record> result;
         try {
             result = ctx.fetch(query);
-        } catch (DataAccessException e) {
+        }
+        catch (DataAccessException e) {
             Thread.currentThread().interrupt();
             throw new ThreadRuntimeException("Error fetching record", e);
         }
