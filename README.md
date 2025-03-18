@@ -1,10 +1,13 @@
 # MultiQuery
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) 
+![CI](https://github.com/macwille/multiquery/actions/workflows/maven.yml/badge.svg)
 
 Project to create a reusable Java library for executing a collection of SQL queries in separate threads automatically.
 
 ## How to Use
+
+The `QueriesToResults` object can be used to execute queries after it's provided with database configurations and the list of queries.
 
 ## Contribute
 
